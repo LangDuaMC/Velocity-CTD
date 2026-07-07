@@ -1167,7 +1167,15 @@ public final class VelocityConfiguration implements ProxyConfig {
       PingPassthroughMode pingPassthroughMode = config.getEnumOrElse("ping-passthrough", PingPassthroughMode.DISABLED);
       String bind = config.getOrElse("bind", "0.0.0.0:25565");
       int maxPlayers = config.getIntOrElse("show-max-players", 500);
-      boolean onlineMode = config.getOrElse("online-mode", true);
+      boolean onlineMode;
+      if (config.contains("online-mode")) {
+        onlineMode = config.get("online-mode");
+      } else {
+        onlineMode = config.getOrElse("online_mode", true);
+        if (config.contains("online_mode")) {
+          LOGGER.warn("'online_mode' is deprecated, please rename it to 'online-mode'.");
+        }
+      }
       boolean forceKeyAuthentication = config.getOrElse("force-key-authentication", true);
       boolean announceForge = config.getOrElse("announce-forge", true);
       boolean preventClientProxyConnections = config.getOrElse("prevent-client-proxy-connections", false);

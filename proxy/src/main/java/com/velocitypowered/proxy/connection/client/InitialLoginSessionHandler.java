@@ -168,8 +168,13 @@ public class InitialLoginSessionHandler implements MinecraftSessionHandler {
         }
 
         mcConnection.eventLoop().execute(() -> {
-          if (!result.isForceOfflineMode()
-              && (server.getConfiguration().isOnlineMode() || result.isOnlineModeAllowed())) {
+          boolean onlineMode = server.getConfiguration().isOnlineMode();
+          if (!onlineMode && result.isOnlineModeAllowed()) {
+            LOGGER.warn("Ignoring forced online-mode login for {} because the proxy is configured for offline mode.",
+                login.getUsername());
+          }
+
+          if (onlineMode && !result.isForceOfflineMode()) {
             // Request encryption.
             EncryptionRequestPacket request = generateEncryptionRequest();
             this.verify = Arrays.copyOf(request.getVerifyToken(), 4);
